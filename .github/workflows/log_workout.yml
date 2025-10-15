@@ -39,7 +39,6 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Append to Google Sheet
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}   # not needed here, but fine
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
           SHEET_TAB: ${{ secrets.SHEET_TAB }}
@@ -51,5 +50,20 @@ jobs:
           METERS: ${{ github.event.inputs.meters }}
           RPE: ${{ github.event.inputs.rpe }}
           NOTES: ${{ github.event.inputs.notes }}
-        run: python log_to_sheet.py
-
+        run: |
+          python - << 'PY'
+          import os
+          from sheets import append_session
+          row = {
+            "Date": os.getenv("DATE") or __import__("datetime").date.today().isoformat(),
+            "Type": os.getenv("TYPE",""),
+            "Details": os.getenv("DETAILS",""),
+            "Avg_HR": os.getenv("AVG_HR",""),
+            "Avg_Split": os.getenv("AVG_SPLIT",""),
+            "Meters": os.getenv("METERS",""),
+            "RPE": os.getenv("RPE",""),
+            "Notes": os.getenv("NOTES","")
+          }
+          append_session(row)
+          print("Logged:", row)
+          PY
