@@ -2,8 +2,8 @@ name: Coach Quinn Daily
 
 on:
   schedule:
-    - cron:  "0 12 * * *"   # runs every day at 12:00 UTC = 8 AM EST
-  workflow_dispatch:          # allows manual run
+    - cron:  "0 12 * * *"   # 12:00 UTC = 08:00 ET
+  workflow_dispatch:
 
 jobs:
   run:
@@ -20,9 +20,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run Coach Quinn
+      - name: Run Daily Plan
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL_PLANS: ${{ secrets.DISCORD_WEBHOOK_URL_PLANS }}
           TIMEZONE: ${{ secrets.TIMEZONE }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_TAB: ${{ secrets.SHEET_TAB }}
         run: python coach_quinn.py
