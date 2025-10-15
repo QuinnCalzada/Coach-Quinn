@@ -1,0 +1,28 @@
+name: Coach Quinn Daily
+
+on:
+  schedule:
+    - cron:  "0 12 * * *"   # runs every day at 12:00 UTC = 8 AM EST
+  workflow_dispatch:          # allows manual run
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Coach Quinn
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TIMEZONE: ${{ secrets.TIMEZONE }}
+        run: python coach_quinn.py
