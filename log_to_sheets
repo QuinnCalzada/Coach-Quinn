@@ -1,0 +1,25 @@
+# log_to_sheet.py
+import os
+from sheets import append_session
+
+def main():
+    # These come from GitHub Actions inputs (env set in workflow)
+    row = {
+        "Date": os.getenv("DATE"),
+        "Type": os.getenv("TYPE"),
+        "Details": os.getenv("DETAILS"),
+        "Avg_HR": os.getenv("AVG_HR", ""),
+        "Avg_Split": os.getenv("AVG_SPLIT", ""),
+        "Meters": os.getenv("METERS", ""),
+        "RPE": os.getenv("RPE", ""),
+        "Notes": os.getenv("NOTES", "")
+    }
+    # Default date to today if not provided
+    if not row["Date"]:
+        from datetime import date
+        row["Date"] = str(date.today())
+    append_session(row)
+    print("Logged to sheet:", row)
+
+if __name__ == "__main__":
+    main()
