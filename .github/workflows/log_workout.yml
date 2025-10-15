@@ -1,0 +1,69 @@
+name: Log Workout to Sheet
+
+on:
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "YYYY-MM-DD (optional; defaults to today)"
+        required: false
+      type:
+        description: "erg_threshold / UT2 / weights / sprints / etc."
+        required: true
+      details:
+        description: "e.g., 5x6 min r26 @ 2k+8"
+        required: true
+      avg_hr:
+        description: "Average HR"
+        required: false
+      avg_split:
+        description: "Avg split (optional)"
+        required: false
+      meters:
+        description: "Meters (optional)"
+        required: false
+      rpe:
+        description: "1–10"
+        required: false
+      notes:
+        description: "Anything notable"
+        required: false
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Append to Google Sheet
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_TAB: ${{ secrets.SHEET_TAB }}
+          DATE: ${{ github.event.inputs.date }}
+          TYPE: ${{ github.event.inputs.type }}
+          DETAILS: ${{ github.event.inputs.details }}
+          AVG_HR: ${{ github.event.inputs.avg_hr }}
+          AVG_SPLIT: ${{ github.event.inputs.avg_split }}
+          METERS: ${{ github.event.inputs.meters }}
+          RPE: ${{ github.event.inputs.rpe }}
+          NOTES: ${{ github.event.inputs.notes }}
+        run: |
+          python - << 'PY'
+          import os
+          from sheets import append_session
+          row = {
+            "Date": os.getenv("DATE") or __import__("datetime").date.today().isoformat(),
+            "Type": os.getenv("TYPE",""),
+            "Details": os.getenv("DETAILS",""),
+            "Avg_HR": os.getenv("AVG_HR",""),
+            "Avg_Split": os.getenv("AVG_SPLIT",""),
+            "Meters": os.getenv("METERS",""),
+            "RPE": os.getenv("RPE",""),
+            "Notes": os.getenv("NOTES","")
+          }
+          append_session(row)
+          print("Logged:", row)
+          PY

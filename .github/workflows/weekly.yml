@@ -2,27 +2,27 @@ name: Coach Quinn Weekly Plan
 
 on:
   schedule:
-    - cron:  "0 12 * * 0"    # 12:00 UTC Sundays = 08:00 ET
-  workflow_dispatch:          # run manually any time
+    - cron:  "0 12 * * 0"    # Sundays 12:00 UTC = 08:00 ET
+  workflow_dispatch:
 
 jobs:
   weekly:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install deps
-        run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt
 
-      - name: Run weekly plan
+      - name: Run Weekly Plan
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL_PLANS: ${{ secrets.DISCORD_WEBHOOK_URL_PLANS }}
           TIMEZONE: ${{ secrets.TIMEZONE }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_TAB: ${{ secrets.SHEET_TAB }}
         run: python weekly_plan.py
