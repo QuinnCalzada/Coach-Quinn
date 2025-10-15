@@ -1,0 +1,28 @@
+name: Coach Quinn Weekly Plan
+
+on:
+  schedule:
+    - cron:  "0 12 * * 0"    # 12:00 UTC Sundays = 08:00 ET
+  workflow_dispatch:          # run manually any time
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Run weekly plan
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          TIMEZONE: ${{ secrets.TIMEZONE }}
+        run: python weekly_plan.py
