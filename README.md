@@ -1,2 +1,2 @@
 # Coach-Quinn
-AI Coach designed for [providing an adaptive rowing training plan.
+AI Coach designed for providing an adaptive rowing training plan.
